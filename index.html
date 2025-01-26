@@ -15,10 +15,15 @@
             padding: 20px;
             background-color: #f4f4f4;
         }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         th, td {
             border: 1px solid #ccc;
@@ -26,7 +31,8 @@
             text-align: center; 
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #007bff;
+            color: white;
         }
         .item-cell {
             text-align: left; 
@@ -50,11 +56,36 @@
         .delete-button:hover {
             background-color: #ffc9bb; 
         }
+        .filter-section {
+            margin-bottom: 20px;
+        }
+        .filter-section input,
+        .filter-section select {
+            width: 30%; 
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
 
     <h2>Checklist Kelengkapan Dokumen Usul Penetapan NIP CPNS 2024 - DRH SSCASN</h2>
+
+    <div class="filter-section">
+        <label for="status-filter"><strong>Status:</strong></label>
+        <select id="status-filter" onchange="filterTable()">
+            <option value="">Semua</option>
+            <option value="belum diunggah">Belum diproses</option>
+            <option value="sedang diproses">Sedang diproses</option>
+            <option value="sudah diunggah">Sudah diunggah</option>
+        </select>
+        <label for="start-date"><strong>Start Date:</strong></label>
+        <input type="date" id="start-date" onchange="filterTable()">
+        <label for="end-date"><strong>End Date:</strong></label>
+        <input type="date" id="end-date" onchange="filterTable()">
+    </div>
 
     <div class="form-section">
         <table id="document-table">
@@ -73,10 +104,10 @@
                 <tr>
                     <td>1</td>
                     <td class="item-cell">Pasfoto terbaru menggunakan pakaian formal dan latar belakang berwarna merah</td>
-                    <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
-                    <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
+                    <td><input type="date" class="date-input" onchange="saveTableData()"></td>
+                    <td><input type="date" class="date-input" onchange="saveTableData()"></td>
                     <td>
-                        <select class="status-dropdown">
+                        <select class="status-dropdown" onchange="saveTableData()">
                             <option value="belum diunggah">Belum diproses</option>
                             <option value="sedang diproses">Sedang diproses</option>
                             <option value="sudah diunggah">Sudah diunggah</option>
@@ -91,10 +122,10 @@
                 <tr>
                     <td>2</td>
                     <td class="item-cell">Ijazah Asli yang digunakan saat melamar CPNS 2024</td>
-                    <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
-                    <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
+                    <td><input type="date" class="date-input" onchange="saveTableData()"></td>
+                    <td><input type="date" class="date-input" onchange="saveTableData()"></td>
                     <td>
-                        <select class="status-dropdown">
+                        <select class="status-dropdown" onchange="saveTableData()">
                             <option value="belum diunggah">Belum diproses</option>
                             <option value="sedang diproses">Sedang diproses</option>
                             <option value="sudah diunggah">Sudah diunggah</option>
@@ -133,10 +164,10 @@
             newRow.innerHTML = `
                 <td>${rowCount}</td>
                 <td class="item-cell"><input type="text" placeholder="Ketikkan item dokumen" class="item-input"></td>
-                <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
-                <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
+                <td><input type="date" class="date-input" onchange="saveTableData()"></td>
+                <td><input type="date" class="date-input" onchange="saveTableData()"></td>
                 <td>
-                    <select class="status-dropdown">
+                    <select class="status-dropdown" onchange="saveTableData()">
                         <option value="belum diunggah">Belum diproses</option>
                         <option value="sedang diproses">Sedang diproses</option>
                         <option value="sudah diunggah">Sudah diunggah</option>
@@ -167,6 +198,33 @@
 
         function printTable() {
             window.print(); // Print the current page
+        }
+
+        function filterTable() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            const rows = document.querySelectorAll('#document-table tbody tr');
+            rows.forEach(row => {
+                const status = row.querySelector('.status-dropdown').value;
+                const start = row.querySelector('td:nth-child(3) input').value;
+                const end = row.querySelector('td:nth-child(4) input').value;
+
+                let showRow = true;
+
+                if (statusFilter && status !== statusFilter) {
+                    showRow = false;
+                }
+                if (startDate && start < startDate) {
+                    showRow = false;
+                }
+                if (endDate && end > endDate) {
+                    showRow = false;
+                }
+
+                row.style.display = showRow ? '' : 'none';
+            });
         }
     </script>
 </body>
