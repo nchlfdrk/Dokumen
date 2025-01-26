@@ -14,6 +14,10 @@
             max-width: 100%;
             max-height: 300px;
         }
+        .pdf-preview {
+            width: 100%;
+            height: 300px;
+        }
     </style>
 </head>
 <body>
@@ -40,15 +44,11 @@
     <script>
         // Data dokumen yang perlu diunggah
         const documents = [
-            { id: 'suratPernyataan', name: 'File Scan Surat Pernyataan Tidak Meminta Perpindahan Penempatan (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'skck', name: 'File Scan Surat Keterangan Catatan Kepolisian (SKCK) (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'suratPernyataan', name: 'File Scan Surat Pernyataan (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'skck', name: 'File Scan SKCK (Ukuran Maksimal 1000 KB, pdf)*' },
             { id: 'drh', name: 'File Scan Daftar Riwayat Hidup (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'suratNarkotika', name: 'File Scan Surat Keterangan Tidak Mengonsumsi Narkotika (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'suratNarkotika', name: 'File Scan Surat Keterangan Narkotika (Ukuran Maksimal 1000 KB, pdf)*' },
             { id: 'suratSehat', name: 'File Scan Surat Keterangan Sehat (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'suratPernyataan5Poin', name: 'File Scan Surat Pernyataan 5 Poin (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'suratLamaran', name: 'File Scan Surat Lamaran CASN (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'ijazah', name: 'File Scan Ijazah Pendidikan Asli (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'transkrip', name: 'File Scan Transkrip Nilai (Ukuran Maksimal 1000 KB, pdf)*' },
             { id: 'pasFoto', name: 'File Pas Foto (Ukuran Maksimal 500 KB, jpg)*' }
         ];
 
@@ -59,7 +59,7 @@
             tableBody.innerHTML = ''; // Clear existing rows
 
             documents.forEach(doc => {
-                const status = uploads[doc.id] ? `<a href="${uploads[doc.id].url}" target="_blank">${uploads[doc.id].name}</a>` : 'Belum diunggah';
+                const status = uploads[doc.id] ? `<a href="#" onclick="viewFile('${doc.id}')">Lihat</a>` : 'Belum diunggah';
                 const row = `
                     <tr>
                         <td>${doc.name}</td>
@@ -67,6 +67,11 @@
                         <td>
                             <input type="file" accept="${doc.id === 'pasFoto' ? 'image/jpeg' : 'application/pdf'}" id="${doc.id}" onchange="handleFileSelect('${doc.id}')" />
                             <button class="btn btn-primary" id="uploadButton-${doc.id}" style="display: none;" onclick="uploadFile('${doc.id}')">Unggah</button>
+                        </td>
+                    </tr>
+                    <tr id="preview-${doc.id}" style="display: none;">
+                        <td colspan="3">
+                            <div id="previewContent-${doc.id}"></div>
                         </td>
                     </tr>
                 `;
@@ -89,18 +94,35 @@
 
         // Function to upload file
         function uploadFile(inputId) {
-            const input = document.getElementById(inputId);
+ const input = document.getElementById(inputId);
             const file = input.files[0];
             const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
 
             if (file) {
-                // Create a URL for the file
                 const fileURL = URL.createObjectURL(file);
-                uploads[inputId] = { name: file.name, url: fileURL }; // Store the file name and URL in local storage
+                uploads[inputId] = { name: file.name, url: fileURL };
                 localStorage.setItem('uploads', JSON.stringify(uploads));
                 loadUploads(); // Reload uploads to update the status
             } else {
                 alert("Silakan pilih file untuk diunggah.");
+            }
+        }
+
+        // Function to view the uploaded file
+        function viewFile(inputId) {
+            const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
+            const previewRow = document.getElementById(`preview-${inputId}`);
+            const previewContent = document.getElementById(`previewContent-${inputId}`);
+
+            if (uploads[inputId]) {
+                const file = uploads[inputId];
+                previewRow.style.display = 'table-row'; // Show the preview row
+
+                if (inputId === 'pasFoto') {
+                    previewContent.innerHTML = `<img src="${file.url}" class="preview" alt="${file.name}" />`;
+                } else {
+                    previewContent.innerHTML = `<iframe src="${file.url}" class="pdf-preview" frameborder="0"></iframe>`;
+                }
             }
         }
 
