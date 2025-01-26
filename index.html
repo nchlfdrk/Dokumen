@@ -3,102 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Unggah Dokumen</title>
+    <title>Formulir Dokumen DRH CPNS 2024</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        .upload-status {
-            margin-top: 10px;
+        body, table, th, td, input, select, textarea {
+            font-family: Arial, sans-serif; 
+            font-size: 15.5px; 
+        }
+        body {
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center; 
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .item-cell {
+            text-align: left; 
         }
         .preview {
             margin-top: 10px;
             max-width: 100%;
             max-height: 300px;
         }
+        .pdf-preview {
+            width: 100%;
+            height: 300px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Unggah Dokumen</h2>
-        <div class="panel panel-info">
-            <div class="panel-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Jenis Dokumen</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="documentTableBody">
-                        <!-- Baris dokumen akan diisi oleh JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
+    <div class="form-section">
+        <table id="document-table">
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td class="item-cell">Pasfoto terbaru menggunakan pakaian formal dan latar belakang berwarna merah</td>
+                    <td>
+                        <input type="file" class="upload-input" accept=".jpg, .jpeg, .png" onchange="uploadFile(this, 1);">
+                        <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td class="item-cell">Ijazah Asli yang digunakan saat melamar CPNS 2024</td>
+                    <td>
+                        <input type="file" class="upload-input" accept=".pdf" onchange="uploadFile(this, 2);">
+                        <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td class="item-cell">Transkrip Nilai Asli yang digunakan saat melamar CPNS 2024</td>
+                    <td>
+                        <input type="file" class="upload-input" accept=".pdf" onchange="uploadFile(this, 3);">
+                        <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td class="item-cell">Surat Lamaran CASN yang diunggah pada saat mendaftar</td>
+                    <td>
+                        <input type="file" class="upload-input" accept=".pdf" onchange="uploadFile(this, 4);">
+                        <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td class="item-cell">Surat Keterangan Sehat Jasmani dan Rohani</td>
+                    <td>
+                        <input type="file" class="upload-input" accept=".pdf" onchange="uploadFile(this, 5);">
+                        <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <script>
-        // Data dokumen yang perlu diunggah
-        const documents = [
-            { id: 'suratPernyataan', name: 'File Scan Surat Pernyataan Tidak Meminta Perpindahan Penempatan (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'skck', name: 'File Scan Surat Keterangan Catatan Kepolisian (SKCK) (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'drh', name: 'File Scan Daftar Riwayat Hidup (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'suratNarkotika', name: 'File Scan Surat Keterangan Tidak Mengonsumsi Narkotika (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'suratSehat', name: 'File Scan Surat Keterangan Sehat (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'suratPernyataan5Poin', name: 'File Scan Surat Pernyataan 5 Poin (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'suratLamaran', name: 'File Scan Surat Lamaran CASN (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'ijazah', name: 'File Scan Ijazah Pendidikan Asli (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'transkrip', name: 'File Scan Transkrip Nilai (Ukuran Maksimal 1000 KB, pdf)*' },
-            { id: 'pasFoto', name: 'File Pas Foto (Ukuran Maksimal 500 KB, jpg)*' }
-        ];
-
         // Load existing uploads from local storage
         function loadUploads() {
             const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
-            const tableBody = document.getElementById('documentTableBody');
-            tableBody.innerHTML = ''; // Clear existing rows
+            const rows = document.querySelectorAll('#document-table tbody tr');
 
-            documents.forEach(doc => {
-                const status = uploads[doc.id] ? `<a href="${uploads[doc.id].url}" target="_blank">${uploads[doc.id].name}</a>` : 'Belum diunggah';
-                const row = `
-                    <tr>
-                        <td>${doc.name}</td>
-                        <td class="upload-status">${status}</td>
-                        <td>
-                            <input type="file" accept="${doc.id === 'pasFoto' ? 'image/jpeg' : 'application/pdf'}" id="${doc.id}" onchange="handleFileSelect('${doc.id}')" />
-                            <button class="btn btn-primary" id="uploadButton-${doc.id}" style="display: none;" onclick="uploadFile('${doc.id}')">Unggah</button>
-                        </td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
+            rows.forEach((row, index) => {
+                const fileLink = row.querySelector('.file-link');
+                if (uploads[index + 1]) {
+                    fileLink.href = uploads[index + 1].url;
+                    fileLink.textContent = uploads[index + 1].name;
+                    fileLink.style.display = 'inline'; // Show the link
+                }
             });
         }
 
-        // Handle file selection
-        function handleFileSelect(inputId) {
-            const input = document.getElementById(inputId);
-            const button = document.getElementById(`uploadButton-${inputId}`);
-            const file = input.files[0];
-
-            if (file) {
-                button.style.display = 'inline-block'; // Show the upload button
-            } else {
-                button.style.display = 'none'; // Hide the upload button if no file is selected
-            }
-        }
-
         // Function to upload file
-        function uploadFile(inputId) {
-            const input = document.getElementById(inputId);
+        function uploadFile(input, index) {
             const file = input.files[0];
             const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
 
             if (file) {
-                // Create a URL for the file
-                const fileURL = URL.createObjectURL(file);
-                uploads[inputId] = { name: file.name, url: fileURL }; // Store the file name and URL in local storage
-                localStorage.setItem('uploads', JSON.stringify(uploads));
-                loadUploads(); // Reload uploads to update the status
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploads[index] = { name: file.name, url: e.target.result }; // Store the file name and data URL in local storage
+                    localStorage.setItem('uploads', JSON.stringify(uploads));
+                    loadUploads(); // Reload uploads to update the status
+                };
+                reader.readAsDataURL(file); // Read the file as a data URL
             } else {
                 alert("Silakan pilih file untuk diunggah.");
             }
