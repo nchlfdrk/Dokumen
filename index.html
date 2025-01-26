@@ -62,6 +62,7 @@
                         <td>
                             <input type="file" accept="${doc.id === 'pasFoto' ? 'image/jpeg' : 'application/pdf'}" id="${doc.id}" onchange="handleFileSelect('${doc.id}')" />
                             <button class="btn btn-primary" id="uploadButton-${doc.id}" style="display: none;" onclick="uploadFile('${doc.id}')">Unggah</button>
+                            <button class="btn btn-info" id="viewButton-${doc.id}" style="display: none;" onclick="viewFile('${doc.id}')">Lihat</button>
                         </td>
                     </tr>
                 `;
@@ -73,13 +74,16 @@
         function handleFileSelect(inputId) {
             const input = document.getElementById(inputId);
             const button = document.getElementById(`uploadButton-${inputId}`);
+            const viewButton = document.getElementById(`viewButton-${inputId}`);
             const file = input.files[0];
 
             if (file) {
                 button.style.display = 'inline-block'; // Show the upload button
+                viewButton.style.display = 'inline-block'; // Show the view button
                 button.dataset.fileName = file.name; // Store the file name in the button
             } else {
                 button.style.display = 'none'; // Hide the upload button if no file is selected
+                viewButton.style.display = 'none'; // Hide the view button if no file is selected
             }
         }
 
@@ -97,6 +101,13 @@
             } else {
                 alert("Silakan pilih file untuk diunggah.");
             }
+        }
+
+        // Function to view uploaded file
+        function viewFile(inputId) {
+            const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
+            const fileName = uploads[inputId] ? uploads[inputId].name : 'Belum ada file yang diunggah';
+            alert(`File yang diunggah: ${fileName}`);
         }
 
         // Load uploads on page load
