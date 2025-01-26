@@ -40,93 +40,134 @@
             width: 100%;
             height: 300px;
         }
+        .delete-button {
+            background-color: red; 
+            color: white; 
+            border: none; 
+            padding: 5px 10px; 
+            cursor: pointer; 
+        }
+        .delete-button:hover {
+            background-color: #ffc9bb; 
+        }
     </style>
 </head>
 <body>
 
+    <h2>Checklist Kelengkapan Dokumen Usul Penetapan NIP CPNS 2024 - DRH SSCASN</h2>
+
     <div class="form-section">
         <table id="document-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Document Item</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Document Link</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
             <tbody>
                 <tr>
                     <td>1</td>
                     <td class="item-cell">Pasfoto terbaru menggunakan pakaian formal dan latar belakang berwarna merah</td>
+                    <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
+                    <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
+                    <td>
+                        <select class="status-dropdown">
+                            <option value="belum diunggah">Belum diproses</option>
+                            <option value="sedang diproses">Sedang diproses</option>
+                            <option value="sudah diunggah">Sudah diunggah</option>
+                        </select>
+                    </td>
                     <td>
                         <input type="file" class="upload-input" accept=".jpg, .jpeg, .png" onchange="uploadFile(this, 1);">
                         <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
                     </td>
+                    <td><button class="delete-button" onclick="deleteRow(this)">Hapus</button></td>
                 </tr>
                 <tr>
                     <td>2</td>
                     <td class="item-cell">Ijazah Asli yang digunakan saat melamar CPNS 2024</td>
+                    <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
+                    <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
+                    <td>
+                        <select class="status-dropdown">
+                            <option value="belum diunggah">Belum diproses</option>
+                            <option value="sedang diproses">Sedang diproses</option>
+                            <option value="sudah diunggah">Sudah diunggah</option>
+                        </select>
+                    </td>
                     <td>
                         <input type="file" class="upload-input" accept=".pdf" onchange="uploadFile(this, 2);">
                         <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
                     </td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td class="item-cell">Transkrip Nilai Asli yang digunakan saat melamar CPNS 2024</td>
-                    <td>
-                        <input type="file" class="upload-input" accept=".pdf" onchange="uploadFile(this, 3);">
-                        <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td class="item-cell">Surat Lamaran CASN yang diunggah pada saat mendaftar</td>
-                    <td>
-                        <input type="file" class="upload-input" accept=".pdf" onchange="uploadFile(this, 4);">
-                        <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td class="item-cell">Surat Keterangan Sehat Jasmani dan Rohani</td>
-                    <td>
-                        <input type="file" class="upload-input" accept=".pdf" onchange="uploadFile(this, 5);">
-                        <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
-                    </td>
+                    <td><button class="delete-button" onclick="deleteRow(this)">Hapus</button></td>
                 </tr>
             </tbody>
         </table>
+        <button class="btn btn-success" onclick="addRow()">Tambah Baris</button>
+        <button class="btn btn-primary" onclick="printTable()">Cetak</button>
     </div>
 
     <script>
-        // Load existing uploads from local storage
-        function loadUploads() {
-            const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
-            const rows = document.querySelectorAll('#document-table tbody tr');
-
-            rows.forEach((row, index) => {
-                const fileLink = row.querySelector('.file-link');
-                if (uploads[index + 1]) {
-                    fileLink.href = uploads[index + 1].url;
-                    fileLink.textContent = uploads[index + 1].name;
-                    fileLink.style.display = 'inline'; // Show the link
-                }
-            });
-        }
-
-        // Function to upload file
-        function uploadFile(input, index) {
+        function uploadFile(input, row) {
             const file = input.files[0];
-            const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
-
+            const link = input.nextElementSibling;
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    uploads[index] = { name: file.name, url: e.target.result }; // Store the file name and data URL in local storage
-                    localStorage.setItem('uploads', JSON.stringify(uploads));
-                    loadUploads(); // Reload uploads to update the status
-                };
-                reader.readAsDataURL(file); // Read the file as a data URL
+                link.style.display = 'block';
+                link.href = URL.createObjectURL(file);
+                link.textContent = 'Lihat File';
             } else {
-                alert("Silakan pilih file untuk diunggah.");
+                link.style.display = 'none';
             }
         }
 
-        // Load uploads on page load
-        window.onload = loadUploads;
+        function addRow() {
+            const tableBody = document.querySelector('#document-table tbody');
+            const rowCount = tableBody.rows.length + 1; // Get the current row count
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td>${rowCount}</td>
+                <td class="item-cell"><input type="text" placeholder="Ketikkan item dokumen" class="item-input"></td>
+                <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
+                <td><input type="date" class="date-input" style="width: 80%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;"></td>
+                <td>
+                    <select class="status-dropdown">
+                        <option value="belum diunggah">Belum diproses</option>
+                        <option value="sedang diproses">Sedang diproses</option>
+                        <option value="sudah diunggah">Sudah diunggah</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="file" class="upload-input" accept=".jpg, .jpeg, .png, .pdf" onchange="uploadFile(this, ${rowCount});">
+                    <a href="#" class="file-link" style="display:none;" target="_blank">Lihat File</a>
+                </td>
+                <td><button class="delete-button" onclick="deleteRow(this)">Hapus</button></td>
+            `;
+
+            tableBody.appendChild(newRow);
+        }
+
+        function deleteRow(button) {
+            const row = button.closest('tr');
+            row.parentNode.removeChild(row);
+            updateRowNumbers(); // Update row numbers after deletion
+        }
+
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#document-table tbody tr');
+            rows.forEach((row, index) => {
+                row.cells[0].textContent = index + 1; // Update the row number
+            });
+        }
+
+        function printTable() {
+            window.print(); // Print the current page
+        }
     </script>
 </body>
 </html>
