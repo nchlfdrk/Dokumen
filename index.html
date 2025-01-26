@@ -54,19 +54,33 @@
             tableBody.innerHTML = ''; // Clear existing rows
 
             documents.forEach(doc => {
-                const status = uploads[doc.id] ? 'Sudah diunggah' : 'Belum diunggah';
+                const status = uploads[doc.id] ? uploads[doc.id].name : 'Belum diunggah';
                 const row = `
                     <tr>
                         <td>${doc.name}</td>
                         <td class="upload-status">${status}</td>
                         <td>
-                            <input type="file" accept="${doc.id === 'pasFoto' ? 'image/jpeg' : 'application/pdf'}" id="${doc.id}" />
-                            <button class="btn btn-primary" onclick="uploadFile('${doc.id}')">Unggah</button>
+                            <input type="file" accept="${doc.id === 'pasFoto' ? 'image/jpeg' : 'application/pdf'}" id="${doc.id}" onchange="handleFileSelect('${doc.id}')" />
+                            <button class="btn btn-primary" id="uploadButton-${doc.id}" style="display: none;" onclick="uploadFile('${doc.id}')">Unggah</button>
                         </td>
                     </tr>
                 `;
                 tableBody.innerHTML += row;
             });
+        }
+
+        // Handle file selection
+        function handleFileSelect(inputId) {
+            const input = document.getElementById(inputId);
+            const button = document.getElementById(`uploadButton-${inputId}`);
+            const file = input.files[0];
+
+            if (file) {
+                button.style.display = 'inline-block'; // Show the upload button
+                button.dataset.fileName = file.name; // Store the file name in the button
+            } else {
+                button.style.display = 'none'; // Hide the upload button if no file is selected
+            }
         }
 
         // Function to upload file
@@ -76,8 +90,8 @@
             const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
 
             if (file) {
-                // Simulate upload process
-                uploads[inputId] = true; // Mark as uploaded
+                // Store the file name in local storage
+                uploads[inputId] = { name: file.name };
                 localStorage.setItem('uploads', JSON.stringify(uploads));
                 loadUploads(); // Reload uploads to update the status
             } else {
