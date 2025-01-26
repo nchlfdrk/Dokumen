@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Unggah Dokumen</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .upload-status {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Unggah Dokumen</h2>
+        <div class="panel panel-info">
+            <div class="panel-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Jenis Dokumen</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="documentTableBody">
+                        <!-- Baris dokumen akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data dokumen yang perlu diunggah
+        const documents = [
+            { id: 'suratPernyataan', name: 'File Scan Surat Pernyataan Tidak Meminta Perpindahan Penempatan (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'skck', name: 'File Scan Surat Keterangan Catatan Kepolisian (SKCK) (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'drh', name: 'File Scan Daftar Riwayat Hidup (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'suratNarkotika', name: 'File Scan Surat Keterangan Tidak Mengonsumsi Narkotika (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'suratSehat', name: 'File Scan Surat Keterangan Sehat (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'suratPernyataan5Poin', name: 'File Scan Surat Pernyataan 5 Poin (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'suratLamaran', name: 'File Scan Surat Lamaran CASN (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'ijazah', name: 'File Scan Ijazah Pendidikan Asli (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'transkrip', name: 'File Scan Transkrip Nilai (Ukuran Maksimal 1000 KB, pdf)*' },
+            { id: 'pasFoto', name: 'File Pas Foto (Ukuran Maksimal 500 KB, jpg)*' }
+        ];
+
+        // Load existing uploads from local storage
+        function loadUploads() {
+            const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
+            const tableBody = document.getElementById('documentTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            documents.forEach(doc => {
+                const status = uploads[doc.id] ? 'Sudah diunggah' : 'Belum diunggah';
+                const row = `
+                    <tr>
+                        <td>${doc.name}</td>
+                        <td class="upload-status">${status}</td>
+                        <td>
+                            <input type="file" accept="${doc.id === 'pasFoto' ? 'image/jpeg' : 'application/pdf'}" id="${doc.id}" />
+                            <button class="btn btn-primary" onclick="uploadFile('${doc.id}')">Unggah</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // Function to upload file
+        function uploadFile(inputId) {
+            const input = document.getElementById(inputId);
+            const file = input.files[0];
+            const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
+
+            if (file) {
+                // Simulate upload process
+                uploads[inputId] = true; // Mark as uploaded
+                localStorage.setItem('uploads', JSON.stringify(uploads));
+                loadUploads(); // Reload uploads to update the status
+            } else {
+                alert("Silakan pilih file untuk diunggah.");
+            }
+        }
+
+        // Load uploads on page load
+        window.onload = loadUploads;
+    </script>
+</body>
+</html>
