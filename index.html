@@ -94,15 +94,18 @@
 
         // Function to upload file
         function uploadFile(inputId) {
- const input = document.getElementById(inputId);
+            const input = document.getElementById(inputId);
             const file = input.files[0];
             const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
 
             if (file) {
-                const fileURL = URL.createObjectURL(file);
-                uploads[inputId] = { name: file.name, url: fileURL };
-                localStorage.setItem('uploads', JSON.stringify(uploads));
-                loadUploads(); // Reload uploads to update the status
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploads[inputId] = { name: file.name, url: e.target.result }; // Store the file name and data URL in local storage
+                    localStorage.setItem('uploads', JSON.stringify(uploads));
+                    loadUploads(); // Reload uploads to update the status
+                };
+                reader.readAsDataURL(file); // Read the file as a data URL
             } else {
                 alert("Silakan pilih file untuk diunggah.");
             }
