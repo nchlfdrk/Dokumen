@@ -9,6 +9,15 @@
         .upload-status {
             margin-top: 10px;
         }
+        .preview {
+            margin-top: 10px;
+            max-width: 100%;
+            max-height: 300px;
+        }
+        .pdf-preview {
+            width: 100%;
+            height: 300px;
+        }
     </style>
 </head>
 <body>
@@ -65,6 +74,11 @@
                             <button class="btn btn-info" id="viewButton-${doc.id}" style="display: none;" onclick="viewFile('${doc.id}')">Lihat</button>
                         </td>
                     </tr>
+                    <tr id="preview-${doc.id}" style="display: none;">
+                        <td colspan="3">
+                            <div id="previewContent-${doc.id}"></div>
+                        </td>
+                    </tr>
                 `;
                 tableBody.innerHTML += row;
             });
@@ -95,7 +109,7 @@
 
             if (file) {
                 // Store the file name in local storage
-                uploads[inputId] = { name: file.name };
+                uploads[inputId] = { name: file.name, type: file.type };
                 localStorage.setItem('uploads', JSON.stringify(uploads));
                 loadUploads(); // Reload uploads to update the status
             } else {
@@ -106,8 +120,27 @@
         // Function to view uploaded file
         function viewFile(inputId) {
             const uploads = JSON.parse(localStorage.getItem('uploads')) || {};
-            const fileName = uploads[inputId] ? uploads[inputId].name : 'Belum ada file yang diunggah';
-            alert(`File yang diunggah: ${fileName}`);
+            const fileData = uploads[inputId];
+
+            if (fileData) {
+                const previewContent = document.getElementById(`previewContent-${inputId}`);
+                const previewRow = document.getElementById(`preview-${inputId}`);
+                
+                // Clear previous content
+                previewContent.innerHTML = '';
+
+                if (fileData.type === 'application/pdf') {
+                    // Display PDF
+                    previewContent.innerHTML = `<iframe class="pdf-preview" src="${fileData.name}" frameborder="0"></iframe>`;
+                } else if (fileData.type === 'image/jpeg' || fileData.type === 'image/png') {
+                    // Display image
+                    previewContent.innerHTML = `<img class="preview" src="${fileData.name}" alt="Preview" />`;
+                }
+
+                previewRow.style.display = 'table-row'; // Show the preview row
+            } else {
+                alert('Belum ada file yang diunggah.');
+            }
         }
 
         // Load uploads on page load
